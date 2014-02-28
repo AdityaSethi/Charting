@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en" ng-app="chartApp">
+<head>
+  <meta charset="utf-8">
+  <title>Charting App</title>
+  <link rel="stylesheet" href="css/app.css"/>
+  <link rel="stylesheet" href="css/vendor/bootstrap.min.css"/>
+</head>
+<body>
+  <header>
+    <div class="container"><h1>Charting App</h1></div>
+  </header>
+  <div class='container'>
+    <div class='row'>
+      <div class='col-md-9' ng-view></div>
+      <div class='col-md-3 marginTop'>
+        <div class='bs-docs-sidebar hidden-print affix-top'>
+          <ul class='nav bs-docs-sidenav'>
+            <li class='active'><a href="#/heatmap">Heatmap</a></li>
+            <li><a href="#/linechart">Line Chart</a></li>
+            <li><a href="#/barchart">Bar Chart</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>  
+  </div>
+
+  <!-- In production use:
+  <script src="//ajax.googleapis.com/ajax/libs/angularjs/x.x.x/angular.min.js"></script>
+  -->
+  <script src="lib/vendor/d3.js"></script>
+  <script src="lib/angular/angular.js"></script>
+  <script src="lib/angular/angular-route.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/controllers/heatmapCtrl.js"></script>
+  <script src="js/services/data.js"></script>
+  <script src="js/directives/heatmap.js"></script>
+</body>
+</html>
