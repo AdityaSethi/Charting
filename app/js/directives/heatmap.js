@@ -10,7 +10,6 @@ angular.module('app.directives')
         chartData: "=chartId",
         tabledata: "=tabledata",
         threshold: "=threshold",
-        textvisible: "=textvisible",
         cellHeight: "=cellheight",
         cellWidth: "=cellwidth",
         colors: "=colors",
@@ -26,24 +25,25 @@ angular.module('app.directives')
     replace: false,
 
     link: function (scope, element, attrs) {
-       function drawChart() {
+      function drawChart() {
           d3.select("#"+scope.chartid+ " svg").remove();
           d3.select("#"+scope.chartid+ " svg.posFixed").remove();
           var api_data = scope.tabledata.values;
           var complete_data = [];
+
           var place = 0;
           for(var i = 0; i < api_data.length; i++){
             for(var j = 0; j < api_data[i].length; j++){
               var dataObj = {row: "", col : "", values: ""};
               dataObj.row = i;
               dataObj.col = j;
-              dataObj.values = api_data[i][j].value;
-              dataObj.cluster = api_data[i][j].cluster || '';
-              dataObj.date = api_data[i][j].date || '';
+              dataObj.values = api_data[i][j];
               complete_data[place] = dataObj;
               place++
             }
           }
+
+          console.log(complete_data)
 
           var margin = { top: 50, right: 10, bottom: 50, left: 50 },
               defaultColors = colors = ['#57c779', '#aed77a', '#ffe97d', '#ffd576', '#ff5d5b'],
@@ -76,7 +76,7 @@ angular.module('app.directives')
           // Color Coding
           var defaultColorSelect = function (value, x){
             var color = "";
-            x = scope.threshold || 2;
+            x = scope.threshold || 50;
             if (x > 0){
               if(value > x){
                 color = colorsArray[0];
@@ -225,7 +225,7 @@ angular.module('app.directives')
                 .data(complete_data, function(d){ return d.row +":"+ d.col})
                 .enter()
                 .append("rect")
-                .text(function(d){ return parseFloat(d.values).toFixed(1)})
+                .text(function(d){ console.log(d.values); return parseFloat(d.values).toFixed(1)})
                 .attr("x", function(d) { return d.col * cellWidth; })
                 .attr("y", function(d) { return d.row * cellSize; })
                 .attr("class", function(d){return "cell cell-border cr main-cell"+(d.row-1)+" cc"+(d.col-1)+" cluster"+(d.cluster);})
@@ -261,7 +261,7 @@ angular.module('app.directives')
                 .data(complete_data, function(d){ return d.row +":"+ d.col})
                 .enter()
                 .append("text")
-                .text(function(d){ return d.values})
+                .text(function(d){ console.log(d.values); return d.values})
                 .attr("x", function(d) { return (d.col * cellWidth)+(cellWidth/5); })
                 .attr("y", function(d) { return (d.row * cellSize)+(cellSize/2)+5; })
                 .attr("class", function(d){return "cell cr"+(d.row-1)+" cc"+(d.col-1)+" cluster"+(d.cluster);})
@@ -311,10 +311,10 @@ angular.module('app.directives')
               .attr("x", function(d, i) { return legendElementWidth * i; })
               .attr("y", height + (cellSize*4));
 
-            if(scope.textvisible == 'no'){
+            if(attrs.textvisible == 'no'){
               heatMapText.remove()
             }  
-            
+            console.log(attrs.textvisible)
 
         // Change ordering of cells
 
