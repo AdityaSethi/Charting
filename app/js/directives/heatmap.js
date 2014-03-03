@@ -2,7 +2,7 @@
 
 angular.module('app.directives')
 
-.directive('chartheatmap', function () {
+.directive('chartheatmap', function (Data) {
   return {
     restrict: 'E',
     template: '<div id={{chartid}} class="heatmap"></div>',
@@ -10,50 +10,43 @@ angular.module('app.directives')
         chartData: "=chartId",
         tabledata: "=tabledata",
         threshold: "=threshold",
-        cellHeight: "=cellheight",
-        cellWidth: "=cellwidth",
         colors: "=colors",
-        clusterSelected: "=clusterselected",
-        columnlabelangle: "=",
         chartid: "=chartid",
-        colorHeatmap: "=colorheatmap",
-        reverseColor: "=reverse",
-        mid: '=mid',
-        bottomval: '=bottomval'
+        colorHeatmap: "=colorheatmap"
     },
     transclude:true,
     replace: false,
 
     link: function (scope, element, attrs) {
-      function drawChart() {
+      console.log("hola")
+      function drawChart(api_data) {
           d3.select("#"+scope.chartid+ " svg").remove();
           d3.select("#"+scope.chartid+ " svg.posFixed").remove();
-          var api_data = scope.tabledata.values;
           var complete_data = [];
-
           var place = 0;
-          for(var i = 0; i < api_data.length; i++){
-            for(var j = 0; j < api_data[i].length; j++){
+          scope.tabledata = api_data;
+          console.log(scope.tabledata);
+          for(var i = 0; i < api_data.values.length; i++){
+            for(var j = 0; j < api_data.values[i].length; j++){
               var dataObj = {row: "", col : "", values: ""};
               dataObj.row = i;
               dataObj.col = j;
-              dataObj.values = api_data[i][j];
+              console.log(api_data.values[i][j])
+              dataObj.values = api_data.values[i][j];
               complete_data[place] = dataObj;
               place++
             }
           }
-
-          console.log(complete_data)
 
           var margin = { top: 50, right: 10, bottom: 50, left: 50 },
               defaultColors = colors = ['#57c779', '#aed77a', '#ffe97d', '#ffd576', '#ff5d5b'],
               col_number=scope.tabledata.headcolumnMiddle.length+1,
               row_number=scope.tabledata.headrow.length+1,
               colorsArray=scope.colors || defaultColors,
-              reverse=scope.reverseColor || false,
-              cellSize=scope.cellHeight || 40,
-              cellWidth=scope.cellWidth || 40,
-              columnAngle = scope.columnlabelangle,
+              reverse=attrs.reverseColor || false,
+              cellSize=attrs.cellheight || 40,
+              cellWidth=attrs.cellwidth || 40,
+              columnAngle = attrs.columnlabelangle,
               width = cellWidth*col_number, // - margin.left - margin.right,
               height = cellSize*row_number , // - margin.top - margin.bottom,
               //gridSize = Math.floor(width / 24),
@@ -148,42 +141,7 @@ angular.module('app.directives')
               .on("mouseout" , function(d) {d3.select(this).classed("text-hover",false);})
               .on("click", function(d,i) {rowSortOrder=!rowSortOrder; sortbylabel("r",i,rowSortOrder);d3.select("#order").property("selectedIndex", 4).node().focus();;})
               ;
-          
-          if(colLabelBottom != undefined){
-            var colLabelsBottom = svg.append("g")
-                .selectAll(".colLabelg")
-                .data(colLabelBottom)
-                .enter()
-                .append("text")
-                .html(function (d) { return d; })
-                .attr("x", function (d, i) { var x = columnAngle==0? i * cellWidth - 5 : 0; return x; })
-                .attr("y", function (d, i) { var y = (row_number*cellSize)-10; return y; })
-                .style("text-anchor", "left")
-                .attr("transform", "translate("+cellWidth/2 + ",-6) rotate ("+ columnAngle +")")
-                .attr("class",  function (d,i) { return "colLabel mono c"+i;} )
-                .on("mouseover", function(d) {d3.select(this).classed("text-hover",true);})
-                .on("mouseout" , function(d) {d3.select(this).classed("text-hover",false);})
-                .on("click", function(d,i) {colSortOrder=!colSortOrder;  sortbylabel("c",i,colSortOrder);d3.select("#order").property("selectedIndex", 4).node().focus();;})
-                ;
-          }
                 
-          if(colLabelMiddle != undefined){    
-            
-            // if(attrs.view != undefined){
-            //   console.log('bookingdis')
-            //     var colLabelMiddleBg = svg.append("g")
-            //     .selectAll(".colLabelg")
-            //     .data(colLabelMiddle)
-            //     .enter()
-            //     .append("rect")
-            //     .text(function(d){ return parseFloat(d.values).toFixed(1)})
-            //     .attr("x", function(d, i) { var x = columnAngle==0? i * cellWidth - 0 : 0; return x; })
-            //     .attr("y", function(d, i) { return -35})
-            //     .attr("class", function(d){return "cell cell-border cr main-cell"+(d.row-1)+" cc"+(d.col-1)+" cluster"+(d.cluster);})
-            //     .attr("width", cellWidth)
-            //     .attr("height", cellSize)
-            //     .style("fill", function(d) {return 'transparent'})
-            // }
 
             var colLabelsMiddle = svg.append("g")
                 .selectAll(".colLabelg")
@@ -191,41 +149,22 @@ angular.module('app.directives')
                 .enter()
                 .append("text")
                 .html(function (d) { return d; })
-                .attr("x", function (d, i) { var x = columnAngle==0? i * cellWidth - 7 : 0; x = attrs.view=='los'?x-12:x; return x; })
+                .attr("x", function (d, i) { var x = i * cellWidth - 7; console.log(x); return x; })
                 .attr("y", function (d, i) { var x = attrs.view != undefined? -10 : 0; return 0 })
                 .style("text-anchor", "left")
-                .attr("transform", "translate("+cellWidth/2 + ",-6) rotate ("+ columnAngle +")")
+                .attr("transform", "translate("+cellWidth/2 + ",-6)")
                 .attr("class",  function (d,i) { return "colLabel mono c"+i;} )
                 .on("mouseover", function(d) {d3.select(this).classed("text-hover",true);})
                 .on("mouseout" , function(d) {d3.select(this).classed("text-hover",false);})
                 .on("click", function(d,i) {colSortOrder=!colSortOrder;  sortbylabel("c",i,colSortOrder);d3.select("#order").property("selectedIndex", 4).node().focus();;})
                 ;
-          }
-          
-          if(colLabelTop != undefined){
-            var colLabelsTop = svg.append("g")
-              .selectAll(".colLabelg")
-              .data(colLabelTop)
-              .enter()
-              .append("text")
-              .html(function (d) { return d; })
-              .attr("x", function (d, i) { var x = columnAngle==0? i * cellWidth - 8 : 0; return x; })
-              .attr("y", function (d, i) { return -15})
-              .style("text-anchor", "left")
-              .attr("transform", "translate("+cellWidth/2 + ",-6) rotate ("+ columnAngle +")")
-              .attr("class",  function (d,i) { return "colLabel mono monthName c"+i;} )
-              .on("mouseover", function(d) {d3.select(this).classed("text-hover",true);})
-              .on("mouseout" , function(d) {d3.select(this).classed("text-hover",false);})
-              .on("click", function(d,i) {colSortOrder=!colSortOrder;  sortbylabel("c",i,colSortOrder);d3.select("#order").property("selectedIndex", 4).node().focus();;})
-              ;      
-          }      
             
           var heatMap = svg.append("g").attr("class","g3")
                 .selectAll(".cellg")
                 .data(complete_data, function(d){ return d.row +":"+ d.col})
                 .enter()
                 .append("rect")
-                .text(function(d){ console.log(d.values); return parseFloat(d.values).toFixed(1)})
+                .text(function(d){ return parseFloat(d.values).toFixed(1)})
                 .attr("x", function(d) { return d.col * cellWidth; })
                 .attr("y", function(d) { return d.row * cellSize; })
                 .attr("class", function(d){return "cell cell-border cr main-cell"+(d.row-1)+" cc"+(d.col-1)+" cluster"+(d.cluster);})
@@ -261,7 +200,7 @@ angular.module('app.directives')
                 .data(complete_data, function(d){ return d.row +":"+ d.col})
                 .enter()
                 .append("text")
-                .text(function(d){ console.log(d.values); return d.values})
+                .text(function(d){ return d.values})
                 .attr("x", function(d) { return (d.col * cellWidth)+(cellWidth/5); })
                 .attr("y", function(d) { return (d.row * cellSize)+(cellSize/2)+5; })
                 .attr("class", function(d){return "cell cr"+(d.row-1)+" cc"+(d.col-1)+" cluster"+(d.cluster);})
@@ -500,59 +439,42 @@ angular.module('app.directives')
               
         }
 
-        scope.$watch(function() { return scope.tabledata; }, function(value) {
-          if(value) {
-            console.log("redrawing chart >>>>>>>>>>>>>>>>>>")
-            drawChart();
-            if(scope.clusterSelected && scope.clusterSelected !== 'all') {
-              $('svg .cell[class^="cell"]:not(.' +scope.clusterSelected+ ')')
-                .css({'fill': '#eee', 'color': '#ddd'})
-            }
-          }
-        }, true); 
-
+        
+        var api_data;
+        Data.get_local(attrs.url).success(function(api_data){
+          api_data = draw_heatmap(api_data.data);
+          drawChart(api_data);
+        })
+          
         scope.$watch(function() { return scope.threshold; }, function(value) {
           if(value && scope.tabledata) {
             console.log("redrawing chart >>>>>>>>>>>>>>>>>>")
             drawChart(scope.tabledata);
           }
         }, true); 
-
-        // scope.$watch(function() { return scope.cellWidth; }, function(value) {
-        //   console.log("redrawing chart >>>>>>>>>>>>>>>>>>")
-        //   if(value && scope.tabledata) {
-        //     drawChart();
-        //     if(scope.clusterSelected && scope.clusterSelected !== 'all') {
-        //       $('svg .cell[class^="cell"]:not(.' +scope.clusterSelected+ ')')
-        //         .css({'fill': '#eee', 'color': '#ddd'})
-        //     }
-        //   }
-        // });
-        
-        scope.$watch('mid',function(){
-          if(scope.tabledata) {
-            drawChart();
-          }  
-        },true)
-
-        scope.$watch('bottomval',function(){
-          if(scope.tabledata) {
-            drawChart();
-          }  
-        },true)
-
-        scope.$watch(function() { return scope.clusterSelected; }, function(value) {
-          if(!value) return;
-          console.log("redrawing chart >>>>>>>>>>>>>>>>>>")
-          if(value && scope.tabledata) {
-            drawChart();
-            console.log(value)
-            if(value !== 'all') {
-              $('svg .cell[class^="cell"]:not(.' +value+ ')')
-                .css({'fill': '#eee', 'color': '#ddd'})
-            }
-          }
-        });  
       }
     };
 });
+
+function draw_heatmap(data){
+  var chart_data = {
+                headcolumnMiddle: [],
+                headrow: [],
+                values: []
+            }
+    for(var i=0; i<data.length; i++){
+      for(var el in data[i]){
+          chart_data.headrow.push(el)
+          var obj=[];
+          for(var j=0; j<data[i][el].length; j++){
+            for(var val in data[i][el][j]){
+              obj.push(data[i][el][j][val])
+              chart_data.headcolumnMiddle.push(val);
+            }
+          }
+          chart_data.values.push(obj)
+        }
+    }
+    chart_data.headcolumnMiddle.splice(obj.length);
+    return chart_data
+}
