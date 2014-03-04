@@ -18,20 +18,17 @@ angular.module('app.directives')
     replace: false,
 
     link: function (scope, element, attrs) {
-      console.log("hola")
       function drawChart(api_data) {
           d3.select("#"+scope.chartid+ " svg").remove();
           d3.select("#"+scope.chartid+ " svg.posFixed").remove();
           var complete_data = [];
           var place = 0;
           scope.tabledata = api_data;
-          console.log(scope.tabledata);
           for(var i = 0; i < api_data.values.length; i++){
             for(var j = 0; j < api_data.values[i].length; j++){
               var dataObj = {row: "", col : "", values: ""};
               dataObj.row = i;
               dataObj.col = j;
-              console.log(api_data.values[i][j])
               dataObj.values = api_data.values[i][j];
               complete_data[place] = dataObj;
               place++
@@ -96,7 +93,6 @@ angular.module('app.directives')
           }
 
           var colorSelect = scope.colorHeatmap || defaultColorSelect;
-          console.log('===================COLORING HEATMAP FUNCTION=====================');
 
           if(columnAngle === undefined) {
             columnAngle = -90;
@@ -149,7 +145,7 @@ angular.module('app.directives')
                 .enter()
                 .append("text")
                 .html(function (d) { return d; })
-                .attr("x", function (d, i) { var x = i * cellWidth - 7; console.log(x); return x; })
+                .attr("x", function (d, i) { var x = i * cellWidth - 7; return x; })
                 .attr("y", function (d, i) { var x = attrs.view != undefined? -10 : 0; return 0 })
                 .style("text-anchor", "left")
                 .attr("transform", "translate("+cellWidth/2 + ",-6)")
@@ -253,7 +249,6 @@ angular.module('app.directives')
             if(attrs.textvisible == 'no'){
               heatMapText.remove()
             }  
-            console.log(attrs.textvisible)
 
         // Change ordering of cells
 
@@ -438,7 +433,6 @@ angular.module('app.directives')
               });
               
         }
-
         
         var api_data;
         Data.get_local(attrs.url).success(function(api_data){
@@ -448,7 +442,6 @@ angular.module('app.directives')
           
         scope.$watch(function() { return scope.threshold; }, function(value) {
           if(value && scope.tabledata) {
-            console.log("redrawing chart >>>>>>>>>>>>>>>>>>")
             drawChart(scope.tabledata);
           }
         }, true); 
