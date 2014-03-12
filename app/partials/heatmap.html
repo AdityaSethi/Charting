@@ -1,11 +1,18 @@
 <h1>Heatmap</h1>
 <div class='col-md-12'>
-	
+	<p>A graphical representation of data using colors to indicate the level of activity, usually using darker colors to indicate low activity, and brighter colors to indicate high activity. For example a heatmap could indicate the number of foreclosures in a geographical area during a set period of time.</p>
 	<chartheatmap chartid="chartid"
 	  cellwidth="50"
 	  cellheight="30"
 	  textvisible='yes'
 	  url='lib/json/data.json'
+	  threshold="56"
 	  >
-	  </chartheatmap>
+	</chartheatmap>
+	<h2>Easy steps to use heatmap directive</h2>
+	<h4>Files that you require to include</h4>
+	<a href="https://github.com/AdityaSethi/Charting/blob/master/app/lib/vendor/d3.js">d3.js</a><br>
+	<a href="https://github.com/AdityaSethi/Charting/blob/master/app/js/services/data.js">data.js</a><br>
+	<a href="https://github.com/AdityaSethi/Charting/blob/master/app/js/directives/heatmap.js">heatmap.js</a><br>
+	<a href="https://github.com/AdityaSethi/Charting/blob/master/app/css/heatmap.css">heatmap.css</a><br>
 </div>

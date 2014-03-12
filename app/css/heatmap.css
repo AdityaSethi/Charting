@@ -17,6 +17,12 @@
 	line-height: 40px;
 }
 
+.heatmap{
+  position: relative;
+  float: left;
+  width: 100%;
+}
+
 rect {
 	fill-opacity: 1;
 }

@@ -1,8 +1,8 @@
-var colorsArray = ['#31A763','#7982B9','#F97848','#6298C4','#FDDE7F','#64BB63', '#0E229B', '#A4A1CC'];
+'use strict';
 
-
-angular.module('app.services').factory('Data',['$http', '$rootScope', '$timeout', '$location', '$q', '$route', function ($http, $rootScope, $timeout, $location, $q, $route){
-
+angular.module('chartApp')
+  .service('Data', function Data($http, $rootScope, $timeout, $location, $q, $route) {
+    // AngularJS will instantiate a singleton by calling "new" on this function
     var Data = {
 
         cache: {},
@@ -75,7 +75,6 @@ angular.module('app.services').factory('Data',['$http', '$rootScope', '$timeout'
             return this.get_promise(path);
         }
 
-}
+        }
     return Data;
-}])
-
+  });

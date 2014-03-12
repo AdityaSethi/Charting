@@ -9,7 +9,6 @@ angular.module('app.directives')
     scope: {
         chartData: "=chartId",
         tabledata: "=tabledata",
-        threshold: "=threshold",
         colors: "=colors",
         chartid: "=chartid",
         colorHeatmap: "=colorheatmap"
@@ -64,33 +63,46 @@ angular.module('app.directives')
 
 
           // Color Coding
-          var defaultColorSelect = function (value, x){
-            var color = "";
-            x = scope.threshold || 50;
-            if (x > 0){
-              if(value > x){
-                color = colorsArray[0];
-              }
-              else if(value <= x && value >= 0 ){
-                color = colorsArray[3];
-              }
-              else{
-                color = colorsArray[4]
+          var defaultColorSelect = function (){
+            var completedataset = [];
+            var data = scope.tabledata;
+            for (var i=0; i<data.values.length; i++){
+              for (var j=0; j<data.values[i].length; j++){
+                completedataset.push(parseFloat(data.values[i][j]));
               }
             }
-            else{
-              if(value >= 0){
-                color = colorsArray[0];
-              }
-              else if(value < 0 && value >= x){
-                color = colorsArray[3];
-              }
-              else{
-                color = colorsArray[4];
-              }
-            }
-            return color;
-          }
+            var minMax = {min: Math.min.apply(Math, completedataset), 
+                          max: Math.max.apply(Math, completedataset)};
+            return function(value){
+                            var color,
+                                colors = [].concat(colorsArray);
+                                    
+                            var comparator = (minMax.max - minMax.min);
+                            var min = minMax.min;
+                            if(reverse) {
+                                colors = colors.reverse();
+                            }
+                            if(value == 'NA'){
+                                color = '#ffffff';
+                            }
+                            else if(value <= ((comparator*10/100)+min)){
+                                color = colors[4];
+                            }
+                            else if((value > ((comparator*10/100)+min) && value <= ((comparator*30/100)+min))){
+                                color = colors[3];
+                            }
+                            else if((value > ((comparator*30/100)+min) && value <= ((comparator*70/100)+min))){
+                                color = colors[2];
+                            }
+                            else if((value > ((comparator*70/100)+min) && value <= ((comparator*90/100)+min))){
+                                color = colors[1];
+                            }
+                            else if(value > ((comparator*90/100)+min)){
+                                color = colors[0];
+                            }
+                            return color;
+                        }
+          }();
 
           var colorSelect = scope.colorHeatmap || defaultColorSelect;
 
@@ -166,7 +178,7 @@ angular.module('app.directives')
                 .attr("class", function(d){return "cell cell-border cr main-cell"+(d.row-1)+" cc"+(d.col-1)+" cluster"+(d.cluster);})
                 .attr("width", cellWidth)
                 .attr("height", cellSize)
-                .style("fill", function(d) { return colorSelect(d.values, scope.tabledata.values, d.cluster, d.date, reverse, d, scope.mid, scope.bottomval) })
+                .style("fill", function(d) { return colorSelect(d.values) })
                 
                 .on("mouseover", function(d){
                        //highlight text
@@ -440,7 +452,7 @@ angular.module('app.directives')
           drawChart(api_data);
         })
           
-        scope.$watch(function() { return scope.threshold; }, function(value) {
+        scope.$watch(function() { return attrs.threshold; }, function(value) {
           if(value && scope.tabledata) {
             drawChart(scope.tabledata);
           }
